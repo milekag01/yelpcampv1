@@ -1,0 +1,63 @@
+<% include ../partials/header %>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-3">
+                <p class="lead">YelpCamp</p>
+                <div class="list-group">
+                    <div class="list-group-item active">Info 1</div>
+                    <div class="list-group-item">Info 2</div>
+                    <div class="list-group-item">Info 3</div>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="thumbnail">
+                    <img src="<%=foundcamp.image%>" class="img-responsive">            
+                    <div class="caption-full">
+                        <h4 class="pull-right">$<%=foundcamp.price%>/night</h4>
+                        <h4><a><%= foundcamp.name %></a></h4>
+                         <p><%= foundcamp.description%></p>
+                         <p><em>Submitted By: <%=foundcamp.author.username%></em></p>
+                         <%if(currentUser && foundcamp.author.id.equals(currentUser._id)){%>
+                             <a href="/campground/<%=foundcamp._id%>/edit" class="btn btn-warning"> Edit </a>
+                             <form class="delete-form" method="POST" action="/campground/<%=foundcamp._id%>?_method=DELETE">
+                                 <button class="btn btn-danger">Delete</button>
+                             </form>
+                         <%}%>
+                    </div>
+                </div>
+                
+                <div class="well">
+
+                    <div class="text-right">
+                         <a href="/campground" class="btn btn-primary" style="float:left;"> Go Back </a>
+                        <a href="/campground/<%=foundcamp._id%>/comments/new" class="btn btn-success"> Add New Comment </a>
+                    </div>
+
+                    
+                    <hr>
+                    <%foundcamp.comments.forEach(function(comment){%>
+                        <div class="row">
+                            <div class="col-md-12">
+                                <strong><%=comment.author.username%></strong>
+                                <span class="pull-right">10 days ago</span>
+                                <p><%=comment.text%></p>
+                                <%if(currentUser && comment.author.id.equals(currentUser._id)){%>
+                                    <a href="/campground/<%=foundcamp._id%>/comments/<%=comment._id%>/edit" class="btn btn-warning btn-xs">Edit</a>
+                                    
+                                    <form class="delete-form" action="/campground/<%=foundcamp._id%>/comments/<%=comment._id%>?_method=DELETE" method="POST">
+                                        <button class="btn btn-danger btn-xs">Delete</button>
+                                    </form>
+                                <%}%>
+                            </div>
+                        </div>
+                    <%})%>
+                
+                </div>
+            </div>
+        </div>
+
+        <div class="form-group">
+            
+        </div>
+    </div>
+<% include ../partials/footer %>
