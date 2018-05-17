@@ -16,14 +16,30 @@ var geocoder = NodeGeocoder(options);
 //google maps
 
 router.get("/",function(req,res){
-    Camp.find({},function(err,newcamp){
-        if(err)
-            req.flash("error","Opps something went wrong");
-        else{
-            res.render("campgrounds/index",{camp: newcamp});        
-        }
-    });
-    
+    if(req.query.search){
+        const regex = new RegExp(escapeRegex(req.query.search), 'gi');
+        
+        Camp.find({name: regex},function(err,newcamp){
+            if(newcamp.length<1 || newcamp==null || newcamp.length==null){
+                req.flash("error","No result available");
+                res.redirect("/campground");
+            }
+            else if(err)
+                req.flash("error","Opps something went wrong");
+            else{
+                res.render("campgrounds/index",{camp: newcamp}); 
+            }
+        });
+    }
+    else{
+        Camp.find({},function(err,newcamp){
+            if(err)
+                req.flash("error","Opps something went wrong");
+            else{
+                res.render("campgrounds/index",{camp: newcamp});        
+            }
+        });
+    }
 });
 
 router.post("/",middleware.isLoggedIn,function(req,res){
@@ -120,5 +136,9 @@ router.delete("/:id",middleware.checkCampgroundOwnership,function(req,res){
         }
     });
 });
+//fuzzy search
+function escapeRegex(text) {
+    return text.replace(/[-[\]{}()*+?.,\\^$|#\s]/g, "\\$&");
+}
 
 module.exports=router;
