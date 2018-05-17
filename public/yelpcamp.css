@@ -79,3 +79,8 @@
     background-color:#F9F9F9;
   }
 }
+/* Google Maps */
+#map {
+    height: 400px;
+    width: 100%;
+}

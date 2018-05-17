@@ -1,12 +1,15 @@
 <% include ../partials/header %>
     <div class="border1">
-        <h1 style="text-align:center;">Create a New CampGround</h1>
+        <h1 style="text-align:center;">Edit CampGround</h1>
         <form method="POST" action="/campground/<%=foundcamp._id%>?_method=PUT">
             <div class="form-group form">
                 <input class="form-control" type="text" name="campground[name]" value="<%=foundcamp.name%>">    
             </div>
             <div class="form-group form">
                 <input class="form-control" type="text" name="campground[image]" value="<%=foundcamp.image%>">    
+            </div>
+            <div class="form-group form">
+                <input class="form-control" type="text" name="campground[location]" value="<%=foundcamp.location%>">    
             </div>
             <div class="form-group form">
                 <input class="form-control" type="text" name="campground[description]" value="<%=foundcamp.description%>">    

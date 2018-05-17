@@ -2,6 +2,18 @@ var express=require("express");
 var router=express.Router();
 var Camp=require("../models/campground");
 var middleware=require("../middlewares/middleware.js");
+//google maps
+var NodeGeocoder = require('node-geocoder');
+ 
+var options = {
+  provider: 'google',
+  httpAdapter: 'https',
+  apiKey: process.env.GEOCODER_API_KEY,
+  formatter: null
+};
+ 
+var geocoder = NodeGeocoder(options);
+//google maps
 
 router.get("/",function(req,res){
     Camp.find({},function(err,newcamp){
@@ -23,8 +35,18 @@ router.post("/",middleware.isLoggedIn,function(req,res){
         id:req.user._id,
         username:req.user.username
     };
+    //google maps
+    geocoder.geocode(req.body.location, function (err, data) {
+        if (err || !data.length) {
+          req.flash('error', 'Invalid address');
+          return res.redirect('back');
+        }
+    var lat = data[0].latitude;
+    var lng = data[0].longitude;
+    var location = data[0].formattedAddress;
+    //google maps
     
-    var newcamp={name: name ,image: image,description:desc,author: author,price: price};
+    var newcamp={name: name ,image: image,description:desc,author: author,price: price, location: location, lat: lat, lng: lng};
     Camp.create(newcamp,function(err,camp){
         if(err)
             {
@@ -36,7 +58,7 @@ router.post("/",middleware.isLoggedIn,function(req,res){
              res.redirect("/campground");
         }
     });
-   
+    });
 });
 
 router.get("/new",middleware.isLoggedIn,function(req,res){
@@ -62,16 +84,28 @@ router.get("/:id/edit",middleware.checkCampgroundOwnership,function(req,res){
     });
 });
 router.put("/:id",middleware.checkCampgroundOwnership,function(req,res){
-    Camp.findByIdAndUpdate(req.params.id,req.body.campground,function(err,updatedcamp){
+    
+    //google maps
+    geocoder.geocode(req.body.location, function (err, data) {
+        if (err || !data.length) {
+          req.flash('error', 'Invalid address');
+          return res.redirect('back');
+        }
+    req.body.campground.lat = data[0].latitude;
+    req.body.campground.lng = data[0].longitude;
+    req.body.campground.location = data[0].formattedAddress;
+    //google maps
+    Camp.findByIdAndUpdate(req.params.id,req.body.campground,function(err,campground){
         if(err){
             req.flash("error","Cannot update campground");
             res.redirect("/campground");
         }
         else{
             req.flash("success","Campground updated succesfully");
-            res.redirect("/campground/"+req.params.id);
+            res.redirect("/campground/"+campground._id);
         }
     });
+});
 });
 
 router.delete("/:id",middleware.checkCampgroundOwnership,function(req,res){

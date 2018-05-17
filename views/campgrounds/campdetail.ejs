@@ -8,6 +8,7 @@
                     <div class="list-group-item">Info 2</div>
                     <div class="list-group-item">Info 3</div>
                 </div>
+                <div id="map"></div>
             </div>
             <div class="col-md-9">
                 <div class="thumbnail">
@@ -60,4 +61,36 @@
             
         </div>
     </div>
+    
+    <!--google map-->
+    <script>
+  function initMap() {
+    var lat = <%= foundcamp.lat %>;
+    var lng = <%= foundcamp.lng %>;
+    var center = {lat: lat, lng: lng };
+    var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 8,
+        center: center,
+        scrollwheel: false
+    });
+    var contentString = `
+      <strong><%= foundcamp.name %><br />
+      <%= foundcamp.location %></strong>
+      <p><%= foundcamp.description %></p>
+    `
+    var infowindow = new google.maps.InfoWindow({
+      content: contentString
+    });
+    var marker = new google.maps.Marker({
+        position: center,
+        map: map
+    });
+    marker.addListener('click', function() {
+      infowindow.open(map, marker);
+    });
+  }
+</script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBfHDOhKcDJfEA9OEbfOwlva3x4-4XfD00&callback=initMap"></script>
+<!--google map-->
+    
 <% include ../partials/footer %>
